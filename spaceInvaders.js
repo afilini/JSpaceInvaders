@@ -280,7 +280,7 @@ var display = [];
 			string += '\n';
 		}
 
-		$('#console').html(string);
+		document.getElementById("console").innerHTML = string;
 
 		if (alive)
 			timeoutIds.rendering = setTimeout(printDisplay, 100);
@@ -322,8 +322,8 @@ var display = [];
 		else 
 			string += "GAME OVER";
 
-		$('#console').css('font-size', '12px');
-		$('#console').html(string);
+		document.getElementById('console').style["font-size"] = "12px";
+		document.getElementById('console').innerHTML = string;
 	}
 
 	function moveSelection(evt) {
