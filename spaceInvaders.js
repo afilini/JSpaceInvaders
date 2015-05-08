@@ -1,5 +1,7 @@
 var display = [];
 
+	var alive = true;
+
 	var objects =  {navicelle: [],
 					cannone: {},
 					proiettili: []
@@ -133,9 +135,9 @@ var display = [];
 				delete objects.proiettili[index];
 			else {
 				for (var i = 0; i < sprites.proiettile.width; i++) 
-					for (var j = 0; j < sprites.proiettile.height; j++) {
+					for (var j = 0; j < sprites.proiettile.height; j++) 
 						display[item.y + j][item.x + i] = sprites[item.tipo].data[j][i];
-					}
+					
 				objects.proiettili[index].y += item.direzione * config.velocitaProiettile;
 			}
 		});
@@ -145,9 +147,9 @@ var display = [];
 		objects.navicelle.forEach(function(item, index){
 			for (var i = 0; i < sprites.navicella.width; i++) 
 				for (var j = 0; j < sprites.navicella.height; j++) {
-					if (display[item.y + j][item.x + i] == '* ') {
+					if (display[item.y + j][item.x + i] == '* ') 
 						delete objects.navicelle[index];
-					}
+					
 					display[item.y + j][item.x + i] = sprites.navicella.data[j][i];
 				}
 		});
@@ -157,7 +159,8 @@ var display = [];
 		for (var i = 0; i < sprites.cannone.width; i++) 
 			for (var j = 0; j < sprites.cannone.height; j++) {
 				if (display[objects.cannone.y + j][objects.cannone.x + i] == 'o ' || display[objects.cannone.y + j][objects.cannone.x + i] == '!')
-					endGame(0);
+					alive = false;
+
 				display[objects.cannone.y + j][objects.cannone.x + i] = sprites.cannone.data[j][i];
 			}
 
@@ -172,7 +175,10 @@ var display = [];
 
 		$('#console').html(string);
 
-		timeoutIds.rendering = setTimeout(printDisplay, 100);
+		if (alive)
+			timeoutIds.rendering = setTimeout(printDisplay, 100);
+		else
+			endGame(false);
 	}
 
 	function start () {
@@ -197,7 +203,7 @@ var display = [];
 		clearTimeout(timeoutIds.gestisciNavicelle);
 		clearTimeout(timeoutIds.fireNavicella);
 		var string = '';
-		console.log("Hai Vinto");
+
 		for (var i = 0; i < (config.height - 1)/2; i++)
 			string += ' \n';
 		for (var i = 0; i < (config.width - 9)/2; i++)
@@ -216,11 +222,25 @@ var display = [];
 			case 37:
 			leftArrowPressed();
 			break;
+
+			case 65:
+			leftArrowPressed();
+			break;
+
 			case 39:
 			rightArrowPressed();
 			break;
+			
+			case 68:
+			rightArrowPressed();
+			break;
+
 			case 32:
 			fire();
+			break;
+
+			default:
+			console.log(evt.keyCode);
 			break;
 			}
 		};
