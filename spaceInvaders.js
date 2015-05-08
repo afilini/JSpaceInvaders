@@ -7,7 +7,8 @@ var display = [];
 	var objects =  {navicelle: [],
 					cannone: {},
 					proiettili: [],
-					boxNavicelle: {}
+					boxNavicelle: {},
+					casette: []
 					};
 
 	var sprites = {
@@ -26,6 +27,10 @@ var display = [];
 					width: 1,
 					height: 2
 					},
+		casetta: {data: [['  ', '~ ', '~ ', '  '], ['% ', '% ', '% ', '% '], ['% ', '  ', '  ', '% ']],
+					width: 4,
+					height: 3
+					}
 	};
 
 	var config = {
@@ -37,7 +42,7 @@ var display = [];
 		vSpaceNavicella: 5,
 		velocitaProiettile: 1,
 		fireDelay: 3000,
-		maxVmove: 28
+		maxVmove: 20
 	};
 
 	var timeoutIds = {
@@ -154,6 +159,11 @@ var display = [];
 		ID++;
 	}
 
+	function genCasetta (x, y) {
+		objects.casette.push({ObjID: ID, x: x, y: y, data: sprites.casetta.data});
+		ID++;
+	}
+
 	function initNavicelle () {
 		var navPerRow = config.nNavicelle / config.nRowNavicelle;
 		var space = Math.floor((config.width - sprites.navicella.width * navPerRow) / (navPerRow + 1));
@@ -165,6 +175,14 @@ var display = [];
 		}
 
 		resizeBox();
+	}
+
+	function initCasette () {
+		var houseNum = config.nNavicelle / config.nRowNavicelle;
+		var space = Math.floor((config.width - sprites.casetta.width * houseNum) / (houseNum + 1));
+
+		for (var i = 0; i < houseNum; i++) 
+			genCasetta(space + (sprites.casetta.width + space) * i, config.height - 5 - sprites.casetta.height);
 	}
 
 	function initCannone () {
@@ -180,6 +198,15 @@ var display = [];
 			for (var j = 0; j < config.width; j++) 
 				display[i][j] = (i == 0 || i == config.height - 1 || j == 0 || j == config.width-1) ? '# ' : '  ';
 		}
+
+		/* CASETTE */
+
+		objects.casette.forEach(function(item, index){
+			for (var i = 0; i < sprites.casetta.width; i++) 
+				for (var j = 0; j < sprites.casetta.height; j++) {
+					display[item.y + j][item.x + i] = item.data[j][i];
+				}
+		});
 
 		/* Proiettili */
 
@@ -237,6 +264,7 @@ var display = [];
 	function start () {
 		initCannone();
 		initNavicelle();
+		initCasette();
 	}
 
 	function leftArrowPressed() {
