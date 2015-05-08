@@ -36,7 +36,8 @@ var display = [];
 		distCannoneBasso: 4,
 		vSpaceNavicella: 5,
 		velocitaProiettile: 1,
-		fireDelay: 3000
+		fireDelay: 3000,
+		maxVmove: 28
 	};
 
 	var timeoutIds = {
@@ -115,7 +116,7 @@ var display = [];
 			else {
 				gestNavicelle.direction *= -1;
 				
-				if (gestNavicelle.totalVmove < 10) {
+				if (gestNavicelle.totalVmove < config.maxVmove) {
 					gestNavicelle.totalVmove += 2;
 					relativeMove.y = 2;
 				}
@@ -126,7 +127,7 @@ var display = [];
 			else {
 				gestNavicelle.direction *= -1;
 				
-				if (gestNavicelle.totalVmove < 10) {
+				if (gestNavicelle.totalVmove < config.maxVmove) {
 					gestNavicelle.totalVmove += 2;
 					relativeMove.y = 2;
 				}
@@ -266,6 +267,7 @@ var display = [];
 		else 
 			string += "GAME OVER";
 
+		$('#console').css('font-size', '12px');
 		$('#console').html(string);
 	}
 
