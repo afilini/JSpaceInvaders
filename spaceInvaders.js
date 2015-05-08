@@ -48,7 +48,7 @@ var display = [];
 	var ID = 0;
 	var gestNavicelle = {
 						timer: 500,
-						movimento: 7,
+						direction: -1,
 						totalVmove: 0
 						};
 
@@ -92,36 +92,48 @@ var display = [];
 				objects.boxNavicelle.DownRight.y = item.y + sprites.navicella.height + 1;
 			}
 		});
+	}
 
-		/*console.log(objects.boxNavicelle.UpLeft.x, objects.boxNavicelle.UpLeft.y);
-		console.log(objects.boxNavicelle.UpRight.x, objects.boxNavicelle.UpRight.y);
-		console.log(objects.boxNavicelle.DownLeft.x, objects.boxNavicelle.DownLeft.y);
-		console.log(objects.boxNavicelle.DownRight.x, objects.boxNavicelle.DownRight.y);*/
+	function relativeBoxMove(x, y) {
+		objects.navicelle.forEach(function(item, index){
+			objects.navicelle[index].x += x;
+			objects.navicelle[index].y += y;
+		});
 	}
 
 	function gestisciNavicelle () {
-		var vMove = 0;
 		if (gestNavicelle.timer > 100)
 			gestNavicelle.timer -= 5;
 
 		resizeBox();
 
-		if (gestNavicelle.movimento < -11) {
-			gestNavicelle.movimento = 12;
-			vMove = 2;
+		var relativeMove = {x: 0, y: 0};
+
+		if (gestNavicelle.direction < 0) {
+			if (objects.boxNavicelle.UpLeft.x > 2)
+				relativeMove.x = -1;
+			else {
+				gestNavicelle.direction *= -1;
+				
+				if (gestNavicelle.totalVmove < 10) {
+					gestNavicelle.totalVmove += 2;
+					relativeMove.y = 2;
+				}
+			}
+		} else {
+			if (objects.boxNavicelle.UpRight.x < config.width - 2)
+				relativeMove.x = +1;
+			else {
+				gestNavicelle.direction *= -1;
+				
+				if (gestNavicelle.totalVmove < 10) {
+					gestNavicelle.totalVmove += 2;
+					relativeMove.y = 2;
+				}
+			}
 		}
 
-		if (gestNavicelle.movimento == 0)
-			vMove = 2;
-
-		gestNavicelle.totalVmove += vMove;
-
-		if (vMove == 0)
-			objects.boxNavicelle.x += (gestNavicelle.movimento > 0 ? 1 : -1);
-		if (gestNavicelle.totalVmove < 24) 
-			objects.boxNavicelle.y += vMove;
-
-		gestNavicelle.movimento--;
+		relativeBoxMove(relativeMove.x, relativeMove.y);
 
 		timeoutIds.gestisciNavicelle = setTimeout(gestisciNavicelle, gestNavicelle.timer);
 	}
@@ -205,11 +217,6 @@ var display = [];
 			}
 
 		/* GENERAZIONE STRINGA */
-
-		display[objects.boxNavicelle.UpLeft.y][objects.boxNavicelle.UpLeft.x] = 'X ';
-		display[objects.boxNavicelle.UpRight.y][objects.boxNavicelle.UpRight.x] = 'X ';
-		display[objects.boxNavicelle.DownLeft.y][objects.boxNavicelle.DownLeft.x] = 'X ';
-		display[objects.boxNavicelle.DownRight.y][objects.boxNavicelle.DownRight.x] = 'X ';
 
 		var string = '';
 		for (var i = 0; i < config.height; i++) {
