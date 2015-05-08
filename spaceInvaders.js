@@ -295,11 +295,13 @@ var display = [];
 	}
 
 	function leftArrowPressed() {
-		objects.cannone.x -= 2;
+		if (objects.cannone.x > 1)
+			objects.cannone.x -= 2;
 	}
 
 	function rightArrowPressed() {
-		objects.cannone.x += 2;
+		if (objects.cannone.x + sprites.cannone.width + 1 < config.width)
+			objects.cannone.x += 2;
 	}
 
 	function fire() {
