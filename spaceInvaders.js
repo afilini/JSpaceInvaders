@@ -4,9 +4,9 @@ var display = [];
 
 	var alive = true;
 
-	var objects =  {navicelle: [],
+	var objects =  {navicelle: {},
 					cannone: {},
-					proiettili: [],
+					proiettili: {},
 					boxNavicelle: {}
 					};
 
@@ -55,10 +55,11 @@ var display = [];
 
 	function fireNavicella() {
 		var counter = 0;
-		objects.navicelle.forEach(function(item, index){
+		for (var ID in objects.navicelle) {
+			var item = objects.navicelle[ID];
 			genProiettile(item.x + (sprites.navicella.width - 1) / 2, item.y + 3 ,1, "varProiettile");
 			counter++;
-		});
+		}
 		if (counter == 0) {
 			endGame(1);
 		}
@@ -72,7 +73,9 @@ var display = [];
 		objects.boxNavicelle.UpRight	= {x: 0, y: 0};
 		objects.boxNavicelle.DownRight	= {x: 0, y: 0};
 
-		objects.navicelle.forEach(function(item, index){
+		for (var ID in objects.navicelle) {
+			var item = objects.navicelle[ID];
+
 			if (item.x - 1 < objects.boxNavicelle.UpLeft.x) {
 				objects.boxNavicelle.UpLeft.x = item.x - 1;
 				objects.boxNavicelle.DownLeft.x = item.x - 1;
@@ -92,14 +95,15 @@ var display = [];
 				objects.boxNavicelle.DownLeft.y = item.y + sprites.navicella.height + 1;
 				objects.boxNavicelle.DownRight.y = item.y + sprites.navicella.height + 1;
 			}
-		});
+		}
 	}
 
 	function relativeBoxMove(x, y) {
-		objects.navicelle.forEach(function(item, index){
-			objects.navicelle[index].x += x;
-			objects.navicelle[index].y += y;
-		});
+		for (var ID in objects.navicelle) {
+			var item = objects.navicelle[ID];
+			objects.navicelle[ID].x += x;
+			objects.navicelle[ID].y += y;
+		}
 	}
 
 	function gestisciNavicelle () {
@@ -140,8 +144,7 @@ var display = [];
 	}
 
 	function genNavicella (x, y) {
-		objects.navicelle.push({ObjID: ID, x: x, y: y});
-		ID++;
+		objects.navicelle[ID++] = {x: x, y: y};
 	}
 
 	function genCannone (x, y) {
@@ -150,8 +153,7 @@ var display = [];
 	}
 
 	function genProiettile (x, y, direzione, tipo) {
-		objects.proiettili.push({ObjID: ID, x: x, y: y, direzione: direzione, tipo: tipo});
-		ID++;
+		objects.proiettili[ID++] = {x: x, y: y, direzione: direzione, tipo: tipo};
 	}
 
 	function initNavicelle () {
@@ -183,29 +185,31 @@ var display = [];
 
 		/* PROIETTILI */
 
-		objects.proiettili.forEach(function(item, index){
+		for (var ID in objects.proiettili) {
+			var item = objects.proiettili[ID];
 			if (item.y < 2 || item.y > config.height - 3) 
-				delete objects.proiettili[index];
+				delete objects.proiettili[ID];
 			else {
 				for (var i = 0; i < sprites.proiettile.width; i++) 
 					for (var j = 0; j < sprites.proiettile.height; j++) 
 						display[item.y + j][item.x + i] = sprites[item.tipo].data[j][i];
 					
-				objects.proiettili[index].y += item.direzione * config.velocitaProiettile;
+				objects.proiettili[ID].y += item.direzione * config.velocitaProiettile;
 			}
-		});
+		}
 
 		/* NAVICELLA */
 
-		objects.navicelle.forEach(function(item, index){
+		for (var ID in objects.navicelle) {
+			var item = objects.navicelle[ID];
 			for (var i = 0; i < sprites.navicella.width; i++) 
 				for (var j = 0; j < sprites.navicella.height; j++) {
 					if (display[item.y + j][item.x + i] == '* ') 
-						delete objects.navicelle[index];
+						delete objects.navicelle[ID];
 					
 					display[item.y + j][item.x + i] = sprites.navicella.data[j][i];
 				}
-		});
+		}
 
 		/* CANNONE */
 
