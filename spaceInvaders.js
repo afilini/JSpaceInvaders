@@ -1,10 +1,13 @@
 var display = [];
 
+	var INF = 999999;
+
 	var alive = true;
 
 	var objects =  {navicelle: [],
 					cannone: {},
-					proiettili: []
+					proiettili: [],
+					boxNavicelle: {}
 					};
 
 	var sprites = {
@@ -62,10 +65,46 @@ var display = [];
 		timeoutIds.fireNavicella = setTimeout(fireNavicella, config.fireDelay);
 	}
 
+	function resizeBox () {
+		objects.boxNavicelle.UpLeft		= {x: INF, y: INF};
+		objects.boxNavicelle.DownLeft	= {x: 0, y: 0};
+		objects.boxNavicelle.UpRight	= {x: 0, y: 0};
+		objects.boxNavicelle.DownRight	= {x: 0, y: 0};
+
+		objects.navicelle.forEach(function(item, index){
+			if (item.x - 1 < objects.boxNavicelle.UpLeft.x) {
+				objects.boxNavicelle.UpLeft.x = item.x - 1;
+				objects.boxNavicelle.DownLeft.x = item.x - 1;
+			} 
+
+			if (item.x + sprites.navicella.width + 1 > objects.boxNavicelle.UpRight.x) {
+				objects.boxNavicelle.UpRight.x = item.x + sprites.navicella.width + 1;
+				objects.boxNavicelle.DownRight.x = item.x + sprites.navicella.width + 1;
+			}
+
+			if (item.y - 1< objects.boxNavicelle.UpLeft.y) {
+				objects.boxNavicelle.UpLeft.y = item.y - 1;
+				objects.boxNavicelle.UpRight.y = item.y - 1;
+			} 
+
+			if (item.y + sprites.navicella.height + 1 > objects.boxNavicelle.UpRight.y) {
+				objects.boxNavicelle.DownLeft.y = item.y + sprites.navicella.height + 1;
+				objects.boxNavicelle.DownRight.y = item.y + sprites.navicella.height + 1;
+			}
+		});
+
+		/*console.log(objects.boxNavicelle.UpLeft.x, objects.boxNavicelle.UpLeft.y);
+		console.log(objects.boxNavicelle.UpRight.x, objects.boxNavicelle.UpRight.y);
+		console.log(objects.boxNavicelle.DownLeft.x, objects.boxNavicelle.DownLeft.y);
+		console.log(objects.boxNavicelle.DownRight.x, objects.boxNavicelle.DownRight.y);*/
+	}
+
 	function gestisciNavicelle () {
 		var vMove = 0;
 		if (gestNavicelle.timer > 100)
 			gestNavicelle.timer -= 5;
+
+		resizeBox();
 
 		if (gestNavicelle.movimento < -11) {
 			gestNavicelle.movimento = 12;
@@ -77,12 +116,11 @@ var display = [];
 
 		gestNavicelle.totalVmove += vMove;
 
-		objects.navicelle.forEach(function(item, index){
-			if (vMove == 0)
-				objects.navicelle[index].x += (gestNavicelle.movimento > 0 ? 1 : -1);
-			if (gestNavicelle.totalVmove < 24) 
-				objects.navicelle[index].y += vMove;
-		});
+		if (vMove == 0)
+			objects.boxNavicelle.x += (gestNavicelle.movimento > 0 ? 1 : -1);
+		if (gestNavicelle.totalVmove < 24) 
+			objects.boxNavicelle.y += vMove;
+
 		gestNavicelle.movimento--;
 
 		timeoutIds.gestisciNavicelle = setTimeout(gestisciNavicelle, gestNavicelle.timer);
@@ -112,6 +150,8 @@ var display = [];
 				genNavicella(space + (7 + space) * j, height + (2 + height) * i);
 			}
 		}
+
+		resizeBox();
 	}
 
 	function initCannone () {
@@ -165,6 +205,11 @@ var display = [];
 			}
 
 		/* GENERAZIONE STRINGA */
+
+		display[objects.boxNavicelle.UpLeft.y][objects.boxNavicelle.UpLeft.x] = 'X ';
+		display[objects.boxNavicelle.UpRight.y][objects.boxNavicelle.UpRight.x] = 'X ';
+		display[objects.boxNavicelle.DownLeft.y][objects.boxNavicelle.DownLeft.x] = 'X ';
+		display[objects.boxNavicelle.DownRight.y][objects.boxNavicelle.DownRight.x] = 'X ';
 
 		var string = '';
 		for (var i = 0; i < config.height; i++) {
