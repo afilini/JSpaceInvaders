@@ -160,7 +160,7 @@ var display = [];
 		var height = config.vSpaceNavicella;
 		for (var i = 0; i < config.nRowNavicelle; i++) {
 			for (var j = 0; j < navPerRow; j++) {
-				genNavicella(space + (7 + space) * j, height + (2 + height) * i);
+				genNavicella(space + (sprites.navicella.width + space) * j, height + (2 + height) * i);
 			}
 		}
 
@@ -181,7 +181,7 @@ var display = [];
 				display[i][j] = (i == 0 || i == config.height - 1 || j == 0 || j == config.width-1) ? '# ' : '  ';
 		}
 
-		/* Proiettili */
+		/* PROIETTILI */
 
 		objects.proiettili.forEach(function(item, index){
 			if (item.y < 2 || item.y > config.height - 3) 
