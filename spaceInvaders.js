@@ -6,7 +6,7 @@ var display = [];
 
 	var objects =  {navicelle: {},
 					cannone: {},
-					proiettili: [],
+					proiettili: {},
 					boxNavicelle: {},
 					casette: {}
 					};
@@ -192,6 +192,18 @@ var display = [];
 		genCannone(space, height);
 	}
 
+	function isPartOf (x, y, objectsArray, type) {
+
+		for (var ID in objectsArray) {
+			var item = objectsArray[ID];
+
+			if ((x >= item.x && x <= item.x + type.width - 1) && (y >= item.y && y <= item.y + type.height - 1)) 
+				return ID
+
+		}
+		return false;
+	}
+
 	function printDisplay () {
 
 		for (var i = 0; i < config.height; i++) {
@@ -200,28 +212,40 @@ var display = [];
 				display[i][j] = (i == 0 || i == config.height - 1 || j == 0 || j == config.width-1) ? '# ' : '  ';
 		}
 
+		/* PROIETTILI */
+
+		for (var ID in objects.proiettili) {
+			var item = objects.proiettili[ID];
+			(function(){
+				if (item.y < 2 || item.y > config.height - 3) 
+					delete objects.proiettili[ID];
+				else {
+					for (var i = 0; i < sprites.proiettile.width; i++) 
+						for (var j = 0; j < sprites.proiettile.height; j++) {
+							if ((touchingID = isPartOf(item.x + i, item.y + j, objects.casette, sprites.casetta)) !== false) {
+
+								delete objects.proiettili[ID];
+								delete objects.casette[touchingID];
+								return;
+							}
+
+							display[item.y + j][item.x + i] = sprites[item.tipo].data[j][i];
+						}
+						
+					objects.proiettili[ID].y += item.direzione * config.velocitaProiettile;
+				}
+			})();
+
+		}
+
 		/* CASETTE */
 
-		objects.casette.forEach(function(item, index){
+		for (var ID in objects.casette) {
+			var item = objects.casette[ID];
 			for (var i = 0; i < sprites.casetta.width; i++) 
 				for (var j = 0; j < sprites.casetta.height; j++) {
 					display[item.y + j][item.x + i] = item.data[j][i];
 				}
-		});
-
-		/* Proiettili */
-
-		for (var ID in objects.proiettili) {
-			var item = objects.proiettili[ID];
-			if (item.y < 2 || item.y > config.height - 3) 
-				delete objects.proiettili[ID];
-			else {
-				for (var i = 0; i < sprites.proiettile.width; i++) 
-					for (var j = 0; j < sprites.proiettile.height; j++) 
-						display[item.y + j][item.x + i] = sprites[item.tipo].data[j][i];
-					
-				objects.proiettili[ID].y += item.direzione * config.velocitaProiettile;
-			}
 		}
 
 		/* NAVICELLA */
