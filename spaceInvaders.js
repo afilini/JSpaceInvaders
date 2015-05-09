@@ -7,7 +7,8 @@ var display = [];
 	var objects =  {navicelle: {},
 					cannone: {},
 					proiettili: {},
-					boxNavicelle: {}
+					boxNavicelle: {},
+					casette: {}
 					};
 
 	var sprites = {
@@ -26,6 +27,10 @@ var display = [];
 					width: 1,
 					height: 2
 					},
+		casetta: {data: [['  ', '~ ', '~ ', '  '], ['% ', '% ', '% ', '% '], ['% ', '  ', '  ', '% ']],
+					width: 4,
+					height: 3
+					}
 	};
 
 	var config = {
@@ -37,7 +42,7 @@ var display = [];
 		vSpaceNavicella: 5,
 		velocitaProiettile: 1,
 		fireDelay: 3000,
-		maxVmove: 28,
+		maxVmove: 20,
 		minFireDelay: 800
 	};
 
@@ -159,6 +164,10 @@ var display = [];
 		objects.proiettili[ID++] = {x: x, y: y, direzione: direzione, tipo: tipo};
 	}
 
+	function genCasetta (x, y) {
+		objects.casette[ID++] = {ObjID: ID, x: x, y: y, data: sprites.casetta.data};
+	}
+
 	function initNavicelle () {
 		var navPerRow = config.nNavicelle / config.nRowNavicelle;
 		var space = Math.floor((config.width - sprites.navicella.width * navPerRow) / (navPerRow + 1));
@@ -172,10 +181,30 @@ var display = [];
 		resizeBox();
 	}
 
+	function initCasette () {
+		var houseNum = config.nNavicelle / config.nRowNavicelle;
+		var space = Math.floor((config.width - sprites.casetta.width * houseNum) / (houseNum + 1));
+
+		for (var i = 0; i < houseNum; i++) 
+			genCasetta(space + (sprites.casetta.width + space) * i, config.height - 5 - sprites.casetta.height);
+	}
+
 	function initCannone () {
 		var space = Math.floor((config.width - sprites.cannone.width) / 2);
 		var height = config.height - config.distCannoneBasso;
 		genCannone(space, height);
+	}
+
+	function isPartOf (x, y, objectsArray, type) {
+
+		for (var ID in objectsArray) {
+			var item = objectsArray[ID];
+
+			if ((x >= item.x && x <= item.x + type.width - 1) && (y >= item.y && y <= item.y + type.height - 1)) 
+				return ID
+
+		}
+		return false;
 	}
 
 	function printDisplay () {
@@ -190,15 +219,36 @@ var display = [];
 
 		for (var ID in objects.proiettili) {
 			var item = objects.proiettili[ID];
-			if (item.y < 2 || item.y > config.height - 3) 
-				delete objects.proiettili[ID];
-			else {
-				for (var i = 0; i < sprites.proiettile.width; i++) 
-					for (var j = 0; j < sprites.proiettile.height; j++) 
-						display[item.y + j][item.x + i] = sprites[item.tipo].data[j][i];
-					
-				objects.proiettili[ID].y += item.direzione * config.velocitaProiettile;
-			}
+			(function(){
+				if (item.y < 2 || item.y > config.height - 3) 
+					delete objects.proiettili[ID];
+				else {
+					for (var i = 0; i < sprites.proiettile.width; i++) 
+						for (var j = 0; j < sprites.proiettile.height; j++) {
+							if ((touchingID = isPartOf(item.x + i, item.y + j, objects.casette, sprites.casetta)) !== false) {
+
+								delete objects.proiettili[ID];
+								delete objects.casette[touchingID];
+								return;
+							}
+
+							display[item.y + j][item.x + i] = sprites[item.tipo].data[j][i];
+						}
+						
+					objects.proiettili[ID].y += item.direzione * config.velocitaProiettile;
+				}
+			})();
+
+		}
+
+		/* CASETTE */
+
+		for (var ID in objects.casette) {
+			var item = objects.casette[ID];
+			for (var i = 0; i < sprites.casetta.width; i++) 
+				for (var j = 0; j < sprites.casetta.height; j++) {
+					display[item.y + j][item.x + i] = item.data[j][i];
+				}
 		}
 
 		/* NAVICELLA */
@@ -244,6 +294,7 @@ var display = [];
 	function start () {
 		initCannone();
 		initNavicelle();
+		initCasette();
 	}
 
 	function leftArrowPressed() {
