@@ -37,7 +37,8 @@ var display = [];
 		vSpaceNavicella: 5,
 		velocitaProiettile: 1,
 		fireDelay: 3000,
-		maxVmove: 28
+		maxVmove: 28,
+		minFireDelay: 800
 	};
 
 	var timeoutIds = {
@@ -55,6 +56,8 @@ var display = [];
 
 	function fireNavicella() {
 		var counter = 0;
+		if (config.fireDelay > config.minFireDelay)
+			config.fireDelay -= 100;
 		for (var ID in objects.navicelle) {
 			var item = objects.navicelle[ID];
 			genProiettile(item.x + (sprites.navicella.width - 1) / 2, item.y + 3 ,1, "varProiettile");
